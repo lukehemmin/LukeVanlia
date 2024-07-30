@@ -1,0 +1,11 @@
+name: LukeVanlia
+version: '1.0-SNAPSHOT'
+main: com.lukehemmin.lukeVanlia.Main
+api-version: '1.21'
+
+commands:
+#  ticket_give:
+#    dscripton: Give a ticket to a player
+#    usage: /ticket_give [item name]
+  help:
+    usage: /help
