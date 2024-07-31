@@ -54,7 +54,7 @@ kotlin {
 
 shadowJar {
     archivesBaseName = "LukeVanilla"
-    destinationDirectory = file("D:\\server\\plugins")
+    destinationDirectory = file("/Users/lukehemmin/Desktop/plugin_devlop/plugins")
     manifest {
         attributes 'Main-Class': 'com.lukehemmin.lukeBanlia.Main'
     }

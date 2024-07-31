@@ -9,3 +9,4 @@ commands:
 #    usage: /ticket_give [item name]
   help:
     usage: /help
+  castmessage:
