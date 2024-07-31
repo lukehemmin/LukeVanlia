@@ -40,6 +40,12 @@ class SnowMinigame(private val plugin: JavaPlugin) : Listener {
         gameStarted = true
         originalPlayers.clear()
         originalPlayers.addAll(playersInRegion) // 게임 시작 시 참여자 목록 저장
+
+        // 게임에 참여한 사람만 서바이벌 모드로 변경
+        for (player in playersInRegion) {
+            player.gameMode = GameMode.SURVIVAL
+        }
+
         assignTeams()
 
         // 지정된 좌표 범위 내의 모든 블럭을 눈블럭으로 채우기
@@ -99,6 +105,9 @@ class SnowMinigame(private val plugin: JavaPlugin) : Listener {
         // 지정된 좌표 범위 내의 모든 블럭을 눈블럭으로 채우기
         fillRegionWithSnow(7, 10, 65, -10, 9, 83)
 
+        // 바닥을 제외한 블럭 청소
+        clearRegionExceptFloor(7, 10, 65, -10, 19, 83)
+
         // 지정된 영역 내의 모든 드랍된 아이템 제거
         clearDroppedItemsInRegion()
 
@@ -145,15 +154,36 @@ class SnowMinigame(private val plugin: JavaPlugin) : Listener {
         }
     }
 
+    private fun clearRegionExceptFloor(x1: Int, y1: Int, z1: Int, x2: Int, y2: Int, z2: Int) {
+        val world = Bukkit.getWorld("world")
+        if (world != null) {
+            val minX = minOf(x1, x2)
+            val maxX = maxOf(x1, x2)
+            val minY = minOf(y1, y2)
+            val maxY = maxOf(y1, y2)
+            val minZ = minOf(z1, z2)
+            val maxZ = maxOf(z1, z2)
+
+            for (x in minX..maxX) {
+                for (y in (minY + 1)..maxY) {
+                    for (z in minZ..maxZ) {
+                        val block = world.getBlockAt(x, y, z)
+                        block.type = Material.AIR
+                    }
+                }
+            }
+        }
+    }
+
     private fun startCountdown() {
-        Bukkit.broadcastMessage("게임이 곧 시작됩니다! 30초 후에 시작됩니다.")
+        Bukkit.broadcastMessage("게임이 곧 시작됩니다! 15초 후에 시작됩니다.")
         countdownTaskId = Bukkit.getScheduler().runTaskLater(plugin, Runnable {
             if (playersInRegion.size in 4..6) {
                 startGame()
             } else {
                 Bukkit.broadcastMessage("게임 시작에 필요한 인원이 부족합니다.")
             }
-        }, 100L).taskId // 30 seconds countdown (20 ticks per second)600L
+        }, 300L).taskId // 30 seconds countdown (20 ticks per second)600L
     }
 
     private fun cancelCountdown() {
@@ -377,7 +407,11 @@ class SnowMinigame(private val plugin: JavaPlugin) : Listener {
                 for (y in minY..maxY) {
                     for (z in minZ..maxZ) {
                         val block = world.getBlockAt(x, y, z)
-                        block.type = Material.SNOW_BLOCK
+                        if (y == minY) {
+                            block.type = Material.SNOW_BLOCK
+                        } else {
+                            block.type = Material.AIR
+                        }
                     }
                 }
             }
